@@ -1,7 +1,13 @@
 // add imports
-import { BsUpload } from "react-icons/bs";
+import { BsTrash, BsUpload } from "react-icons/bs";
 import { FormEvent, ReactNode, useState } from "react";
-import { useGetTodosQuery } from "../../api/apiSlice";
+import {
+  useAddTodoMutation,
+  useDeleteTodoMutation,
+  useGetTodosQuery,
+  useUpdateTodoMutation,
+} from "../../api/apiSlice";
+import { nanoid } from "@reduxjs/toolkit";
 
 const TodoList = () => {
   const [newTodo, setNewTodo] = useState("");
@@ -13,10 +19,13 @@ const TodoList = () => {
     isError,
     error,
   } = useGetTodosQuery();
+  const [addTodo] = useAddTodoMutation();
+  const [updateTodo] = useUpdateTodoMutation();
+  const [deleteTodo] = useDeleteTodoMutation();
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    //addTodo
+    addTodo({ id: Number(nanoid()), userId: 1, title: "", completed: false });
     setNewTodo("");
   };
 
@@ -24,8 +33,26 @@ const TodoList = () => {
   if (isLoading) {
     content = <p>Loading...</p>;
   } else if (isSuccess) {
-    // TODO: must render todo card
-    content = JSON.stringify(todos);
+    content = todos.map((todo) => {
+      return (
+        <article key={todo.id}>
+          <div className="todo">
+            <input
+              type="checkbox"
+              checked={todo.completed}
+              id={todo.id.toString()}
+              onChange={() =>
+                updateTodo({ ...todo, completed: !todo.completed })
+              }
+            />
+            <label htmlFor={todo.id.toString()}>{todo.title}</label>
+          </div>
+          <button className="trash" onClick={() => deleteTodo({ id: todo.id })}>
+            <BsTrash />
+          </button>
+        </article>
+      );
+    });
   } else if (isError) {
     content = <p>{error as ReactNode}</p>;
   }
