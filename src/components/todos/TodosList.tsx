@@ -1,9 +1,18 @@
 // add imports
 import { BsUpload } from "react-icons/bs";
-import { FormEvent, useState } from "react";
+import { FormEvent, ReactNode, useState } from "react";
+import { useGetTodosQuery } from "../../api/apiSlice";
 
 const TodoList = () => {
   const [newTodo, setNewTodo] = useState("");
+
+  const {
+    data: todos,
+    isLoading,
+    isSuccess,
+    isError,
+    error,
+  } = useGetTodosQuery();
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -12,6 +21,14 @@ const TodoList = () => {
   };
 
   let content;
+  if (isLoading) {
+    content = <p>Loading...</p>;
+  } else if (isSuccess) {
+    // TODO: must render todo card
+    content = JSON.stringify(todos);
+  } else if (isError) {
+    content = <p>{error as ReactNode}</p>;
+  }
 
   const newItemSection = (
     <form onSubmit={handleSubmit}>
