@@ -5,16 +5,24 @@ import { Todo } from "../types";
 export const apiSlice = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQuery({ baseUrl: BASE_URL }),
+  tagTypes: ["Todos"],
   endpoints: (builder) => ({
     getTodos: builder.query<Todo[], void>({
       query: () => "/todos",
+      providesTags: ["Todos"],
     }),
-    addTodo: builder.mutation<string, Todo>({
-      query: (todo) => ({
-        url: "/todos",
-        method: "POST",
-        body: todo,
-      }),
+    addTodo: builder.mutation<
+      string,
+      { userId: number; title: string; completed: boolean }
+    >({
+      query: (todo) => {
+        return {
+          url: "/todos",
+          method: "POST",
+          body: todo,
+        };
+      },
+      invalidatesTags: ["Todos"],
     }),
     updateTodo: builder.mutation<string, Todo>({
       query: (todo) => ({
@@ -22,6 +30,7 @@ export const apiSlice = createApi({
         method: "PATCH",
         body: todo,
       }),
+      invalidatesTags: ["Todos"],
     }),
     deleteTodo: builder.mutation<string, { id: number }>({
       query: ({ id }) => ({
@@ -29,6 +38,7 @@ export const apiSlice = createApi({
         method: "DELETE",
         body: id,
       }),
+      invalidatesTags: ["Todos"],
     }),
   }),
 });

@@ -7,7 +7,6 @@ import {
   useGetTodosQuery,
   useUpdateTodoMutation,
 } from "../../api/apiSlice";
-import { nanoid } from "@reduxjs/toolkit";
 
 const TodoList = () => {
   const [newTodo, setNewTodo] = useState("");
@@ -25,7 +24,11 @@ const TodoList = () => {
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    addTodo({ id: Number(nanoid()), userId: 1, title: "", completed: false });
+    addTodo({
+      userId: 1,
+      title: newTodo,
+      completed: false,
+    });
     setNewTodo("");
   };
 
